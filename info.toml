@@ -1,0 +1,8 @@
+[meta]
+name     = "Edit Any Item"
+author   = "XertroV"
+category = "Map Editor"
+version  = "0.2.0"
+
+[script]
+#__DEFINES__
