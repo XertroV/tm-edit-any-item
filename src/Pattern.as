@@ -3,13 +3,12 @@
 // mp4 will never be updated so just nop the calls dw about patterns
 const string CanEditBlockItemCall1 = "e8 77 df ff ff 85 c0 0f 84 6b 05 00 00 48 8d 8e c0 0f 00 00 e8 f3 d1 e2 ff 89 be c0 0f 00 00";
 const string CanEditBlockItemCall2 = "e8 25 df ff ff 85 c0 0f 84 19 05 00 00 89 be c0 0f 00 00 48 8b 9e 80 05 00 00 48 8b 8e 10 10 00 00";
+//                                    vv call              vv jmp to not fail
+const string CanConvertBlockToItem = "E8 03 B0 F4 FF 85 C0 75 33";
 
-MemPatcher@ PatchCall1 = MemPatcher(
-    CanEditBlockItemCall1, {0}, {"90 90 90 90 90"}
-);
-MemPatcher@ PatchCall2 = MemPatcher(
-    CanEditBlockItemCall2, {0}, {"90 90 90 90 90"}
-);
+MemPatcher@ PatchCall1 = MemPatcher(CanEditBlockItemCall1, {0}, {"90 90 90 90 90"});
+MemPatcher@ PatchCall2 = MemPatcher(CanEditBlockItemCall2, {0}, {"90 90 90 90 90"});
+MemPatcher@ PatchBlockToItemCheck = MemPatcher(CanConvertBlockToItem, {7}, {"EB"});
 
 #elif TURBO
 
@@ -23,13 +22,13 @@ MemPatcher@ PatchCall1 = MemPatcher(
 //                                       vv function offset      vv jump offset       vv editor offset  vv call           vv editor offset     vv editor offset
 const string CanEditBlockItemCall1 = "e8 ?? ?? ?? ?? 85 c0 0f 84 ?? ?? 00 00 48 8d 8f ?? ?? 00 00 e8 ?? ?? ?? ?? 48 8b 87 ?? ?? 00 00 48 89 87 ?? ?? 00 00";
 const string CanEditBlockItemCall2 = "e8 ?? ?? ?? ?? 85 c0 0f 84 ?? ?? 00 00 48 8b 9f ?? ?? 00 00 44 89 bf ?? ?? 00 00 48 8b 8f ?? ?? 00 00 48 3b d9";
+//                                     vv cmp +0x1b8        vv jmp to fail
+const string CanEditBlockWaterCheck = "44 39 A8 ?? 01 00 00 77 ?? FF C3 3B DE 72"; //  ?? 49 8B 86 ?? 11 00 00 48 85 C0";
+
 //                                                                                                         ^^ editor offset     ^^ editor offset
-MemPatcher@ PatchCall1 = MemPatcher(
-    CanEditBlockItemCall1, {0}, {"90 90 90 90 90"}
-);
-MemPatcher@ PatchCall2 = MemPatcher(
-    CanEditBlockItemCall2, {0}, {"90 90 90 90 90"}
-);
+MemPatcher@ PatchCall1 = MemPatcher(CanEditBlockItemCall1, {0}, {"90 90 90 90 90"});
+MemPatcher@ PatchCall2 = MemPatcher(CanEditBlockItemCall2, {0}, {"90 90 90 90 90"});
+MemPatcher@ PatchBlockToItemCheck = MemPatcher(CanEditBlockWaterCheck, {7}, {"90 90"});
 
 #endif
 
@@ -37,11 +36,12 @@ MemPatcher@ PatchCall2 = MemPatcher(
 
 bool IsPatchEnabled {
     get {
-        return PatchCall1.IsApplied && PatchCall2.IsApplied;
+        return PatchCall1.IsApplied && PatchCall2.IsApplied && PatchBlockToItemCheck.IsApplied;
     }
     set {
         PatchCall1.IsApplied = value;
         PatchCall2.IsApplied = value;
+        PatchBlockToItemCheck.IsApplied = value;
     }
 }
 

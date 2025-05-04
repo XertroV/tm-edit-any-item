@@ -1,0 +1,9 @@
+Trackmania.exe.text+F437BA - 44 39 A8 B8010000     - cmp [rax+000001B8],r13d { jump = fail to create custom block due to water }
+Trackmania.exe.text+F437C1 - 77 3F                 - ja Trackmania.exe.text+F43802
+Trackmania.exe.text+F437C3 - FF C3                 - inc ebx
+Trackmania.exe.text+F437C5 - 3B DE                 - cmp ebx,esi
+Trackmania.exe.text+F437C7 - 72 E7                 - jb Trackmania.exe.text+F437B0
+Trackmania.exe.text+F437C9 - 49 8B 86 A0110000     - mov rax,[r14+000011A0]
+Trackmania.exe.text+F437D0 - 48 85 C0              - test rax,rax
+
+44 39 A8 ?? 01 00 00 77 ?? FF C3 3B DE 72 ?? 49 8B 86 ?? 11 00 00 48 85 C0
